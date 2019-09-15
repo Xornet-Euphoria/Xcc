@@ -28,6 +28,8 @@ typedef enum {
     ND_ADD,
     ND_SUB,
     ND_NUM,
+    ND_MUL,
+    ND_DIV,
 } NodeKind;
 
 typedef struct Node Node;
@@ -133,7 +135,13 @@ Node *new_mul() {
     Node *node = new_primary();
 
     while (true) {
-        return node;
+        if (consume('*')) {
+            node = new_node(ND_MUL, node, new_primary());
+        } else if (consume('/')) {
+            node = new_node(ND_DIV, node, new_primary());
+        } else {
+            return node;
+        }
     }
 }
 
@@ -165,7 +173,7 @@ Token *tokenize(char *p) {
             continue;
         }
 
-        if (*p == '+' || *p == '-') {
+        if (*p == '+' || *p == '-' || *p == '*' || *p == '/') {
             cur = new_token(TK_RESERVED, cur, p);
             p++;
             continue;
@@ -204,6 +212,13 @@ void gen(Node *node) {
             break;
         case ND_SUB:
             printf("    sub rax, rdi\n");
+            break;
+        case ND_MUL:
+            printf("    imul rax, rdi\n");
+            break;
+        case ND_DIV:
+            printf("    cqo\n");
+            printf("    idiv rdi\n");
             break;
     }
 

@@ -1,4 +1,4 @@
-CFLAGS=-std=c11 -g -stati
+CFLAGS=-std=c11 -g -static
 
 xcc: xcc.c
 

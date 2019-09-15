@@ -7,7 +7,7 @@
 
 // トークンの種類を定義
 typedef enum {
-    TK_RESERVED, // 記号(+,-)
+    TK_RESERVED,
     TK_NUM,      // 数字
     TK_EOF,      // 終端
 } TokenKind;
@@ -22,6 +22,21 @@ struct Token {
     Token *next;    // 次のトークン
     int val;        // 数字ならその値
     char *str;      // トークン文字
+};
+
+typedef enum {
+    ND_ADD,
+    ND_SUB,
+    ND_NUM,
+} NodeKind;
+
+typedef struct Node Node;
+
+struct Node {
+    NodeKind kind;
+    Node *lhs;
+    Node *rhs;
+    int val;
 };
 
 // 現時点で注目しているトークン、これを進めていくことで順にトークンを処理していく
@@ -80,6 +95,52 @@ bool at_eof() {
     return current_token->kind == TK_EOF;
 }
 
+Node *new_expr();
+Node *new_mul();
+Node *new_primary();
+
+// 新しいノード(但し数字を除く)
+Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
+    Node *new_nd = calloc(1, sizeof(Node));
+    new_nd->kind = kind;
+    new_nd->lhs = lhs;
+    new_nd->rhs = rhs;
+    return new_nd;
+}
+
+Node *new_node_num(int val) {
+    Node *new_nd = calloc(1, sizeof(Node));
+    new_nd->kind = ND_NUM;
+    new_nd->val = val;
+    return new_nd;
+}
+
+Node *new_expr() {
+    Node *node = new_mul();
+
+    while (true) {
+        if (consume('+')) {
+            node = new_node(ND_ADD, node, new_mul());
+        } else if (consume('-')) {
+            node = new_node(ND_SUB, node, new_mul());
+        } else {
+            return node;
+        }
+    }
+}
+
+Node *new_mul() {
+    Node *node = new_primary();
+
+    while (true) {
+        return node;
+    }
+}
+
+Node *new_primary() {
+    return new_node_num(expect_number());
+}
+
 // *curに続く新しいトークンを種類と文字を指定して生成し、それを返す
 Token *new_token(TokenKind kind, Token *cur, char *str) {
     // Tokenと同じサイズのメモリを確保
@@ -124,6 +185,31 @@ Token *tokenize(char *p) {
     return head.next;
 }
 
+void gen(Node *node) {
+    if (node->kind == ND_NUM) {
+        printf("    push %d\n", node->val);
+        return;
+    }
+
+    gen(node->lhs);
+    gen(node->rhs);
+
+    // 左から演算をしていくことからraxの値をrdiの値を使って操作していくことにする
+    printf("    pop rdi\n"); // rhs
+    printf("    pop rax\n"); // lhs
+
+    switch (node->kind) {
+        case ND_ADD:
+            printf("    add rax, rdi\n");
+            break;
+        case ND_SUB:
+            printf("    sub rax, rdi\n");
+            break;
+    }
+
+    printf("    push rax\n");
+}
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "invalid number of argument\n");
@@ -133,24 +219,16 @@ int main(int argc, char **argv) {
     user_input = argv[1];
     // tokenize
     current_token = tokenize(argv[1]);
+    // 抽象木の作成
+    Node *node = new_expr();
 
     printf(".intel_syntax noprefix\n");
     printf(".global main\n");
     printf("main:\n");
 
-    // 式の頭には数字が来ることを期待する
-    printf("    mov rax, %d\n", expect_number());
+    gen(node);
 
-    while (!at_eof()) {
-        if (consume('+')) {
-            printf("    add rax, %d\n", expect_number());
-            continue;
-        }
-
-        expect('-');
-        printf("    sub rax, %d\n", expect_number());
-    }
-
+    printf("    pop rax\n");
     printf("    ret\n");
     return 0;
 }

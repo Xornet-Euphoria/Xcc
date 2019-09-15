@@ -27,10 +27,19 @@ struct Token {
 // 現時点で注目しているトークン、これを進めていくことで順にトークンを処理していく
 Token *current_token;
 
+// ユーザー入力(mainでargv[1]に保存されているいるもの)
+char *user_input;
+
 // エラー出力
-void error(char *fmt, ...) {
+void error(char *loc, char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
+
+    // 現在見ている文字のアドレスからuser_input始点アドレスを引くことで何文字目かを特定
+    int pos = loc - user_input;
+    fprintf(stderr, "%s\n", user_input);
+    fprintf(stderr, "%*s", pos, " ");
+    fprintf(stderr, "^ ");
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
     exit(1);
@@ -50,7 +59,7 @@ bool consume(char op) {
 // 期待文字列でなければエラー
 void expect(char op) {
     if (current_token->kind != TK_RESERVED || current_token->str[0] != op) {
-        error("this token is not '%c'", op);
+        error(current_token->str, "this token is not '%c'", op);
     }
 
     current_token = current_token->next;
@@ -59,7 +68,7 @@ void expect(char op) {
 // 数値を期待しそれを返す
 int expect_number() {
     if (current_token->kind != TK_NUM) {
-        error("this token is not a number");
+        error(current_token->str, "this token is not a number");
     }
 
     int val = current_token->val;
@@ -107,7 +116,7 @@ Token *tokenize(char *p) {
             continue;
         }
 
-        error("Can't tokenize this token");
+        error(p, "Can't tokenize this token");
     }
 
     new_token(TK_EOF, cur, p);
@@ -121,6 +130,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    user_input = argv[1];
     // tokenize
     current_token = tokenize(argv[1]);
 

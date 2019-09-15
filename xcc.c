@@ -146,6 +146,13 @@ Node *new_mul() {
 }
 
 Node *new_primary() {
+    if (consume('(')) {
+        Node *node = new_expr();
+        // 括弧が閉じられているかの確認
+        expect(')');
+        return node;
+    }
+
     return new_node_num(expect_number());
 }
 
@@ -173,7 +180,7 @@ Token *tokenize(char *p) {
             continue;
         }
 
-        if (*p == '+' || *p == '-' || *p == '*' || *p == '/') {
+        if (strchr("+-*/()", *p)) {
             cur = new_token(TK_RESERVED, cur, p);
             p++;
             continue;

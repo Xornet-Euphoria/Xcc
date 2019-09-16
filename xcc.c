@@ -136,6 +136,16 @@ Node *new_expr() {
 
 Node *new_equality() {
     Node *node = new_relational();
+    
+    while (true) {
+        if (consume("==")) {
+            node = new_node(ND_EQ, node, new_add());
+        } else if (consume("!=")) {
+            node = new_node(ND_NEQ, node, new_add());
+        } else {
+            return node;
+        }
+    }
 
     return node;
 }
@@ -302,6 +312,16 @@ void gen(Node *node) {
         case ND_LEQ:
             printf("    cmp rax, rdi\n");
             printf("    setle al\n");
+            printf("    movzb rax, al\n");
+            break;
+        case ND_EQ:
+            printf("    cmp rax, rdi\n");
+            printf("    sete al\n");
+            printf("    movzb rax, al\n");
+            break;
+        case ND_NEQ:
+            printf("    cmp rax, rdi\n");
+            printf("    setne al\n");
             printf("    movzb rax, al\n");
             break;
     }

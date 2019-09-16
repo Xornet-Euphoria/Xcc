@@ -99,6 +99,7 @@ bool at_eof() {
 
 Node *new_expr();
 Node *new_mul();
+Node *new_unary();
 Node *new_primary();
 
 // 新しいノード(但し数字を除く)
@@ -132,17 +133,31 @@ Node *new_expr() {
 }
 
 Node *new_mul() {
-    Node *node = new_primary();
+    Node *node = new_unary();
 
     while (true) {
         if (consume('*')) {
-            node = new_node(ND_MUL, node, new_primary());
+            node = new_node(ND_MUL, node, new_unary());
         } else if (consume('/')) {
-            node = new_node(ND_DIV, node, new_primary());
+            node = new_node(ND_DIV, node, new_unary());
         } else {
             return node;
         }
     }
+}
+
+Node *new_unary() {
+    // +x = x と扱う
+    if (consume('+')) {
+        return new_primary();
+    }
+
+    // -x = (0 - x) と扱う
+    if (consume('-')) {
+        return new_node(ND_SUB, new_node_num(0), new_primary());
+    }
+
+    return new_primary();
 }
 
 Node *new_primary() {

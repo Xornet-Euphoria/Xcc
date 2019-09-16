@@ -28,9 +28,15 @@ struct Token {
 typedef enum {
     ND_ADD,
     ND_SUB,
-    ND_NUM,
     ND_MUL,
     ND_DIV,
+    ND_NUM,
+    ND_EQ,  // equal(==)
+    ND_NEQ, // not equal(!=)
+    ND_LT,  // less than(<)
+    ND_LEQ, // less or equal than(<=)
+    ND_GT,  // greater than(>)
+    ND_GEQ, // greater or equal than(>=)
 } NodeKind;
 
 typedef struct Node Node;
@@ -103,6 +109,9 @@ bool at_eof() {
 }
 
 Node *new_expr();
+Node *new_equality();
+Node *new_relational();
+Node *new_add();
 Node *new_mul();
 Node *new_unary();
 Node *new_primary();
@@ -124,6 +133,30 @@ Node *new_node_num(int val) {
 }
 
 Node *new_expr() {
+    return new_equality();
+}
+
+Node *new_equality() {
+    Node *node = new_relational();
+
+    return node;
+}
+
+Node *new_relational() {
+    Node *node = new_add();
+
+    while (true) {
+        if (consume("<")) {
+            node = new_node(ND_LT, node, new_add());
+        } else if (consume(">")) {
+            node = new_node(ND_GT, node, new_add());
+        } else {
+            return node;
+        }
+    }
+}
+
+Node *new_add() {
     Node *node = new_mul();
 
     while (true) {
@@ -200,7 +233,7 @@ Token *tokenize(char *p) {
             continue;
         }
 
-        if (strchr("+-*/()", *p)) {
+        if (strchr("+-*/()<>", *p)) {
             cur = new_token(TK_RESERVED, cur, p);
             cur->len = 1;
             p++;
@@ -247,6 +280,16 @@ void gen(Node *node) {
         case ND_DIV:
             printf("    cqo\n");
             printf("    idiv rdi\n");
+            break;
+        case ND_LT:
+            printf("    cmp rax, rdi\n");
+            printf("    setl al\n");
+            printf("    movzb rax, al\n");
+            break;
+        case ND_GT:
+            printf("    cmp rdi, rax\n");
+            printf("    setl al\n");
+            printf("    movzb rax, al\n");
             break;
     }
 

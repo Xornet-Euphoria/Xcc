@@ -149,7 +149,8 @@ Node *new_relational() {
         if (consume("<")) {
             node = new_node(ND_LT, node, new_add());
         } else if (consume(">")) {
-            node = new_node(ND_GT, node, new_add());
+            // a > b と b < a は同値
+            node = new_node(ND_LT, new_add(), node);
         } else {
             return node;
         }
@@ -233,6 +234,16 @@ Token *tokenize(char *p) {
             continue;
         }
 
+        if (strncmp(p, "==", 2) == 0 ||
+            strncmp(p, "!=", 2) == 0 ||
+            strncmp(p, "<=", 2) == 0 ||
+            strncmp(p, ">=", 2) == 0) {
+                cur = new_token(TK_RESERVED, cur, p);
+                cur->len = 2;
+                p += 2;
+                continue;
+            }
+
         if (strchr("+-*/()<>", *p)) {
             cur = new_token(TK_RESERVED, cur, p);
             cur->len = 1;
@@ -283,11 +294,6 @@ void gen(Node *node) {
             break;
         case ND_LT:
             printf("    cmp rax, rdi\n");
-            printf("    setl al\n");
-            printf("    movzb rax, al\n");
-            break;
-        case ND_GT:
-            printf("    cmp rdi, rax\n");
             printf("    setl al\n");
             printf("    movzb rax, al\n");
             break;

@@ -1,0 +1,66 @@
+#include <ctype.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// token
+// トークンの種類を定義
+typedef enum {
+    TK_RESERVED,
+    TK_NUM,      // 数字
+    TK_EOF,      // 終端
+} TokenKind;
+
+// Token構造体を単にTokenとして定義
+typedef struct Token Token;
+
+// Token構造体
+// これを複数繋げていくことでトークナイズする
+struct Token {
+    TokenKind kind; // トークン種
+    Token *next;    // 次のトークン
+    int val;        // 数字ならその値
+    char *str;      // トークン文字列
+    int len;        // トークン長(==, <=等に対応))
+};
+
+// node
+typedef enum {
+    ND_ADD,
+    ND_SUB,
+    ND_MUL,
+    ND_DIV,
+    ND_NUM,
+    ND_EQ,  // equal(==)
+    ND_NEQ, // not equal(!=)
+    ND_LT,  // less than(<)
+    ND_LEQ, // less or equal than(<=)
+} NodeKind;
+
+typedef struct Node Node;
+
+struct Node {
+    NodeKind kind;
+    Node *lhs;
+    Node *rhs;
+    int val;
+};
+
+// variables
+// 現時点で注目しているトークン、これを進めていくことで順にトークンを処理していく
+extern Token *current_token;
+
+// ユーザー入力(mainでargv[1]に保存されているいるもの)
+extern char *user_input;
+
+// prototype declaration
+void error(char *loc, char *fmt, ...);
+bool consume(char *op);
+void expect(char *op);
+int expect_number();
+bool at_eof();
+Token *tokenize(char *p);
+Node *new_expr();
+void generate_asm(Node *node);

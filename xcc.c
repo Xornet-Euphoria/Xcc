@@ -35,8 +35,6 @@ typedef enum {
     ND_NEQ, // not equal(!=)
     ND_LT,  // less than(<)
     ND_LEQ, // less or equal than(<=)
-    ND_GT,  // greater than(>)
-    ND_GEQ, // greater or equal than(>=)
 } NodeKind;
 
 typedef struct Node Node;
@@ -151,6 +149,10 @@ Node *new_relational() {
         } else if (consume(">")) {
             // a > b と b < a は同値
             node = new_node(ND_LT, new_add(), node);
+        } else if (consume("<=")) {
+            node = new_node(ND_LEQ, node, new_add());
+        } else if (consume(">=")) {
+            node = new_node(ND_LEQ, new_add(), node);
         } else {
             return node;
         }
@@ -295,6 +297,11 @@ void gen(Node *node) {
         case ND_LT:
             printf("    cmp rax, rdi\n");
             printf("    setl al\n");
+            printf("    movzb rax, al\n");
+            break;
+        case ND_LEQ:
+            printf("    cmp rax, rdi\n");
+            printf("    setle al\n");
             printf("    movzb rax, al\n");
             break;
     }

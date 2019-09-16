@@ -21,7 +21,8 @@ struct Token {
     TokenKind kind; // トークン種
     Token *next;    // 次のトークン
     int val;        // 数字ならその値
-    char *str;      // トークン文字
+    char *str;      // トークン文字列
+    int len;        // トークン長(==, <=等に対応))
 };
 
 typedef enum {
@@ -64,8 +65,10 @@ void error(char *loc, char *fmt, ...) {
 
 // トークン種が期待通りだったときに次のトークンへ進める処理群
 // 単なる文字判定
-bool consume(char op) {
-    if (current_token->kind != TK_RESERVED || current_token->str[0] != op) {
+bool consume(char *op) {
+    if (current_token->kind != TK_RESERVED || 
+        current_token->len != strlen(op)   || 
+        strncmp(current_token->str, op, current_token->len) != 0) {
         return false;
     }
     // 次へ進める
@@ -74,9 +77,11 @@ bool consume(char op) {
 }
 
 // 期待文字列でなければエラー
-void expect(char op) {
-    if (current_token->kind != TK_RESERVED || current_token->str[0] != op) {
-        error(current_token->str, "this token is not '%c'", op);
+void expect(char *op) {
+    if (current_token->kind != TK_RESERVED || 
+        current_token->len != strlen(op)   || 
+        strncmp(current_token->str, op, current_token->len) != 0) {
+        error(current_token->str, "this token is not '%s'", op);
     }
 
     current_token = current_token->next;
@@ -122,9 +127,9 @@ Node *new_expr() {
     Node *node = new_mul();
 
     while (true) {
-        if (consume('+')) {
+        if (consume("+")) {
             node = new_node(ND_ADD, node, new_mul());
-        } else if (consume('-')) {
+        } else if (consume("-")) {
             node = new_node(ND_SUB, node, new_mul());
         } else {
             return node;
@@ -136,9 +141,9 @@ Node *new_mul() {
     Node *node = new_unary();
 
     while (true) {
-        if (consume('*')) {
+        if (consume("*")) {
             node = new_node(ND_MUL, node, new_unary());
-        } else if (consume('/')) {
+        } else if (consume("/")) {
             node = new_node(ND_DIV, node, new_unary());
         } else {
             return node;
@@ -148,12 +153,12 @@ Node *new_mul() {
 
 Node *new_unary() {
     // +x = x と扱う
-    if (consume('+')) {
+    if (consume("+")) {
         return new_primary();
     }
 
     // -x = (0 - x) と扱う
-    if (consume('-')) {
+    if (consume("-")) {
         return new_node(ND_SUB, new_node_num(0), new_primary());
     }
 
@@ -161,10 +166,10 @@ Node *new_unary() {
 }
 
 Node *new_primary() {
-    if (consume('(')) {
+    if (consume("(")) {
         Node *node = new_expr();
         // 括弧が閉じられているかの確認
-        expect(')');
+        expect(")");
         return node;
     }
 
@@ -197,6 +202,7 @@ Token *tokenize(char *p) {
 
         if (strchr("+-*/()", *p)) {
             cur = new_token(TK_RESERVED, cur, p);
+            cur->len = 1;
             p++;
             continue;
         }

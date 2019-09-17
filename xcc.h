@@ -33,6 +33,7 @@ typedef enum {
     ND_SUB,
     ND_MUL,
     ND_DIV,
+    ND_MOD,    // modulo (%)
     ND_NUM,
     ND_EQ,     // equal(==)
     ND_NEQ,    // not equal(!=)

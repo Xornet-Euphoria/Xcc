@@ -130,6 +130,8 @@ static Node *new_mul() {
             node = new_node(ND_MUL, node, new_unary());
         } else if (consume("/")) {
             node = new_node(ND_DIV, node, new_unary());
+        } else if (consume("%")) {
+            node = new_node(ND_MOD, node, new_unary());
         } else {
             return node;
         }

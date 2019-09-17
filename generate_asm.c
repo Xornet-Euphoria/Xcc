@@ -93,9 +93,13 @@ void generate_asm() {
     printf("main:\n");
 
     // ローカル変数確保(a~zの26個)
+    int var_count = 0;
+    for (LVar *lvar = local_var; lvar; lvar = lvar->next) {
+        var_count++;
+    }
     printf("    push rbp\n");
     printf("    mov rbp, rsp\n");
-    printf("    sub rsp, 208\n");
+    printf("    sub rsp, %d\n", var_count * 8);
 
     for (int i = 0; code[i] != NULL; i++) {
         gen(code[i]);

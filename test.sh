@@ -27,5 +27,8 @@ try 1 "foo = 3; bar = 4; foo < bar;"
 try 1 "mod = 7 % 3; mod;"
 try 0 "mod = 8 % 4; mod;"
 try 7 "mod = 7 % 9; mod;"
+try 3 "foo = 3; return foo;"
+try 4 "foo = 2; return foo * 2;"
+try 5 "return 5; return 1;"
 
 echo OK

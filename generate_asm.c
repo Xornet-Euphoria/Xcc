@@ -34,6 +34,13 @@ static void gen(Node *node) {
             printf("    mov [rax], rdi\n");
             printf("    push rdi\n"); // 二重代入(a=b=2)を許すためにrdiを再利用する
             return;
+        case ND_RETURN:
+            gen(node->lhs);
+            printf("    pop rax\n");
+            printf("    mov rsp, rbp\n");
+            printf("    pop rbp\n");
+            printf("    ret\n");
+            return;
     }
 
     gen(node->lhs);
@@ -92,7 +99,7 @@ void generate_asm() {
     printf(".global main\n");
     printf("main:\n");
 
-    // ローカル変数確保(a~zの26個)
+    // ローカル変数確保
     int var_count = 0;
     for (LVar *lvar = local_var; lvar; lvar = lvar->next) {
         var_count++;

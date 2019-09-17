@@ -9,6 +9,7 @@
 // トークンの種類を定義
 typedef enum {
     TK_RESERVED, // 予約語
+    TK_RETURN,   // return
     TK_IDENT,    // 識別子(変数とか)
     TK_NUM,      // 数字
     TK_EOF,      // 終端
@@ -41,6 +42,7 @@ typedef enum {
     ND_LEQ,    // less or equal than(<=)
     ND_ASSIGN, // assignment(=)
     ND_LVAR,   // local variable
+    ND_RETURN, // return
 } NodeKind;
 
 typedef struct Node Node;
@@ -81,6 +83,7 @@ void error(char *loc, char *fmt, ...);
 bool consume(char *op);
 void expect(char *op);
 int expect_number();
+bool consume_type(TokenKind);
 Token *consume_ident();
 bool at_eof();
 Token *tokenize(char *p);

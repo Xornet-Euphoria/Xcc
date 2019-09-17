@@ -121,9 +121,14 @@ Token *tokenize(char *p) {
         }
 
         if (isalpha(*p)) {
-            cur = new_token(TK_IDENT, cur, p);
-            cur->len = 1;
+            char *q = p;
             p++;
+            int length = 1;
+            while (isalnum(*p)) {
+                p++;
+            }
+            cur = new_token(TK_IDENT, cur, q);
+            cur->len = length;
             continue;
         }
 

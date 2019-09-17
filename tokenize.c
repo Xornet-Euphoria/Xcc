@@ -26,15 +26,6 @@ void error(char *loc, char *fmt, ...) {
 }
 
 // トークン種が期待通りだったときに次のトークンへ進める処理群
-// 種類で判断
-bool consume_type(TokenKind type) {
-    if (current_token->kind != type) {
-        return false;
-    }
-
-    current_token = current_token->next;
-    return true;
-}
 
 // 単なる文字判定
 bool consume(char *op) {
@@ -108,7 +99,7 @@ Token *tokenize(char *p) {
         }
 
         if (strncmp(p, "return", 6) == 0 && !isalnum(p[6])) {
-            cur = new_token(TK_RETURN, cur, p);
+            cur = new_token(TK_RESERVED, cur, p);
             cur->len = 6;
             p += 6;
             continue;

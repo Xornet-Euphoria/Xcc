@@ -55,7 +55,7 @@ void new_program() {
 static Node *new_stmt() {
     Node *node;
 
-    if (consume_type(TK_RETURN)) {
+    if (consume("return")) {
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;
         node->lhs = new_expr(); // 1引数は左辺とみなす

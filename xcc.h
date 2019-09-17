@@ -8,8 +8,8 @@
 // token
 // トークンの種類を定義
 typedef enum {
+    // returnもifもreservedでまとめられるのでは?
     TK_RESERVED, // 予約語
-    TK_RETURN,   // return
     TK_IDENT,    // 識別子(変数とか)
     TK_NUM,      // 数字
     TK_EOF,      // 終端
@@ -43,6 +43,10 @@ typedef enum {
     ND_ASSIGN, // assignment(=)
     ND_LVAR,   // local variable
     ND_RETURN, // return
+    ND_IF,     // if
+    ND_ELSE,   // else 
+    ND_WHILE,  // while
+    ND_FOR,    // for
 } NodeKind;
 
 typedef struct Node Node;

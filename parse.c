@@ -1,6 +1,8 @@
 #include "xcc.h"
 
 Node *code[100];
+LVar *local_var;
+static int current_offset = 0;
 
 static Node *new_stmt();
 static Node *new_expr();
@@ -28,7 +30,18 @@ static Node *new_node_num(int val) {
     return new_nd;
 }
 
-void *new_program() {
+// 名前で変数検索
+static LVar *find_lvar(Token *tok) {
+    for (LVar *var = local_var; var; var = var->next) {
+        if (var->len == tok->len && strncmp(tok->str, var->name, var->len) == 0) {
+            return var;
+        }
+    }
+
+    return NULL;
+}
+
+void new_program() {
     int i = 0;
     while (!at_eof()) {
         code[i] = new_stmt();
@@ -152,7 +165,20 @@ static Node *new_primary() {
     // todo: new_node_identとか作った方が楽かもしれない
     Node *new_nd = calloc(1, sizeof(Node));
     new_nd->kind = ND_LVAR;
-    new_nd->offset = (current_token->str[0] - 'a' + 1) * 8;
-    current_token = current_token->next;
+
+    Token *tk = consume_ident();
+    LVar *lvar = find_lvar(tk);
+    
+    if (lvar == NULL) {
+        lvar = calloc(1, sizeof(LVar));
+        lvar->next = local_var;
+        lvar->name = tk->str;
+        lvar->len = tk->len;
+        lvar->offset = current_offset + 8;
+        current_offset = lvar->offset;
+        local_var = lvar;
+    }
+
+    new_nd->offset = lvar->offset;
     return new_nd;
 }

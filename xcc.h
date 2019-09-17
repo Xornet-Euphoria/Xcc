@@ -52,6 +52,15 @@ struct Node {
     int offset; // ローカル変数のスタック上での位置(rbp - x)
 };
 
+typedef struct LVar LVar;
+
+struct LVar {
+    LVar *next;
+    char *name;
+    int len;
+    int offset;
+};
+
 // variables
 // 現時点で注目しているトークン、これを進めていくことで順にトークンを処理していく
 extern Token *current_token;
@@ -62,13 +71,17 @@ extern char *user_input;
 // コード
 extern Node *code[100];
 
+// 現在見ているローカル変数
+LVar *local_var;
+
 // prototype declaration
 void simple_error(char *fmt, ...);
 void error(char *loc, char *fmt, ...);
 bool consume(char *op);
 void expect(char *op);
 int expect_number();
+Token *consume_ident();
 bool at_eof();
 Token *tokenize(char *p);
-void *new_program();
+void new_program();
 void generate_asm();

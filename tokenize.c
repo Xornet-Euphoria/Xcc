@@ -49,6 +49,17 @@ void expect(char *op) {
     current_token = current_token->next;
 }
 
+// 変数識別子を期待
+Token *consume_ident() {
+    if (current_token->kind != TK_IDENT) {
+        error(current_token->str, "this token is not identifier");
+    }
+
+    Token *ret_token = current_token;
+    current_token = current_token->next;
+    return ret_token;
+}
+
 // 数値を期待しそれを返す
 int expect_number() {
     if (current_token->kind != TK_NUM) {
@@ -109,7 +120,7 @@ Token *tokenize(char *p) {
             continue;
         }
 
-        if ('a' <= *p && *p <= 'z') {
+        if (isalpha(*p)) {
             cur = new_token(TK_IDENT, cur, p);
             cur->len = 1;
             p++;

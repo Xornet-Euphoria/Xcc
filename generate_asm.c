@@ -1,6 +1,7 @@
 #include "xcc.h"
 
 Node *code[100];
+static int label_index = 0;
 
 // 代入式で次に操作するアドレスを用意
 void gen_lvar(Node *node) {
@@ -14,6 +15,10 @@ void gen_lvar(Node *node) {
 }
 
 static void gen(Node *node) {
+    int current_label;
+    current_label = label_index;
+    label_index++;
+
     switch (node->kind) {
         case ND_NUM:
             printf("    push %d\n", node->val);
@@ -33,6 +38,14 @@ static void gen(Node *node) {
             printf("    pop rax\n"); // 代入先アドレス
             printf("    mov [rax], rdi\n");
             printf("    push rdi\n"); // 二重代入(a=b=2)を許すためにrdiを再利用する
+            return;
+        case ND_IF:
+            gen(node->lhs);
+            printf("    pop rax\n");
+            printf("    cmp rax, 0\n");
+            printf("    je .Lend%d\n", current_label);
+            gen(node->rhs);
+            printf(".Lend%d:\n", current_label);
             return;
         case ND_RETURN:
             gen(node->lhs);

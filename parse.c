@@ -55,6 +55,18 @@ void new_program() {
 static Node *new_stmt() {
     Node *node;
 
+    // if
+    if (consume("if")) {
+        expect("(");
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_IF;
+        node->lhs = new_expr();
+        expect(")");
+        node->rhs = new_stmt();
+
+        return node;
+    }
+
     if (consume("return")) {
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;

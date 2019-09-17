@@ -30,5 +30,7 @@ try 7 "mod = 7 % 9; mod;"
 try 3 "foo = 3; return foo;"
 try 4 "foo = 2; return foo * 2;"
 try 5 "return 5; return 1;"
+try 1 "foo = 3; if (foo == 3) return 1;"
+try 0 "foo = 2; if (foo % 2 == 1) return 1; return 0;"
 
 echo OK

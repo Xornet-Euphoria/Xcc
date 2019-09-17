@@ -3,6 +3,28 @@
 char *user_input;
 Token *current_token;
 
+// エラー関連
+void simple_error(char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+    exit(1);
+}
+
+void error(char *loc, char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+
+    int pos = loc - user_input;
+    fprintf(stderr, "%s\n", user_input);
+    fprintf(stderr, "%*s", pos, ""); // print pos spaces.
+    fprintf(stderr, "^ ");
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+    exit(1);
+}
+
 // トークン種が期待通りだったときに次のトークンへ進める処理群
 // 単なる文字判定
 bool consume(char *op) {
@@ -74,7 +96,7 @@ Token *tokenize(char *p) {
                 continue;
             }
 
-        if (strchr("+-*/()<>", *p)) {
+        if (strchr("+-*/()<>=;", *p)) {
             cur = new_token(TK_RESERVED, cur, p);
             cur->len = 1;
             p++;
@@ -84,6 +106,13 @@ Token *tokenize(char *p) {
         if (isdigit(*p)) {
             cur = new_token(TK_NUM, cur, p);
             cur->val = strtol(p, &p, 10);
+            continue;
+        }
+
+        if ('a' <= *p && *p <= 'z') {
+            cur = new_token(TK_IDENT, cur, p);
+            cur->len = 1;
+            p++;
             continue;
         }
 

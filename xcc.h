@@ -8,7 +8,8 @@
 // token
 // トークンの種類を定義
 typedef enum {
-    TK_RESERVED,
+    TK_RESERVED, // 予約語
+    TK_IDENT,    // 識別子(変数とか)
     TK_NUM,      // 数字
     TK_EOF,      // 終端
 } TokenKind;
@@ -33,10 +34,12 @@ typedef enum {
     ND_MUL,
     ND_DIV,
     ND_NUM,
-    ND_EQ,  // equal(==)
-    ND_NEQ, // not equal(!=)
-    ND_LT,  // less than(<)
-    ND_LEQ, // less or equal than(<=)
+    ND_EQ,     // equal(==)
+    ND_NEQ,    // not equal(!=)
+    ND_LT,     // less than(<)
+    ND_LEQ,    // less or equal than(<=)
+    ND_ASSIGN, // assignment(=)
+    ND_LVAR,   // local variable
 } NodeKind;
 
 typedef struct Node Node;
@@ -46,6 +49,7 @@ struct Node {
     Node *lhs;
     Node *rhs;
     int val;
+    int offset; // ローカル変数のスタック上での位置(rbp - x)
 };
 
 // variables
@@ -55,12 +59,16 @@ extern Token *current_token;
 // ユーザー入力(mainでargv[1]に保存されているいるもの)
 extern char *user_input;
 
+// コード
+extern Node *code[100];
+
 // prototype declaration
+void simple_error(char *fmt, ...);
 void error(char *loc, char *fmt, ...);
 bool consume(char *op);
 void expect(char *op);
 int expect_number();
 bool at_eof();
 Token *tokenize(char *p);
-Node *new_expr();
-void generate_asm(Node *node);
+void *new_program();
+void generate_asm();

@@ -10,9 +10,9 @@ int main(int argc, char **argv) {
     // tokenize
     current_token = tokenize(argv[1]);
     // 抽象木の作成
-    Node *node = new_expr();
+    new_program();
 
-    generate_asm(node);
+    generate_asm();
 
     return 0;
 }

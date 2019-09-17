@@ -1,5 +1,10 @@
 #include "xcc.h"
 
+Node *code[100];
+
+static Node *new_stmt();
+static Node *new_expr();
+static Node *new_assign();
 static Node *new_equality();
 static Node *new_relational();
 static Node *new_add();
@@ -23,8 +28,36 @@ static Node *new_node_num(int val) {
     return new_nd;
 }
 
-Node *new_expr() {
-    return new_equality();
+void *new_program() {
+    int i = 0;
+    while (!at_eof()) {
+        code[i] = new_stmt();
+        i++;
+    }
+    // 終端
+    code[i] = NULL;
+}
+
+// statement
+static Node *new_stmt() {
+    Node *node = new_expr();
+    expect(";");
+
+    return node;
+}
+
+static Node *new_expr() {
+    return new_assign();
+}
+
+static Node *new_assign() {
+    Node *node = new_equality();
+
+    if (consume("=")) {
+        node = new_node(ND_ASSIGN, node, new_assign());
+    }
+
+    return node;
 }
 
 static Node *new_equality() {
@@ -112,5 +145,14 @@ static Node *new_primary() {
         return node;
     }
 
-    return new_node_num(expect_number());
+    if (current_token->kind == TK_NUM) {
+        return new_node_num(expect_number());
+    }
+
+    // todo: new_node_identとか作った方が楽かもしれない
+    Node *new_nd = calloc(1, sizeof(Node));
+    new_nd->kind = ND_LVAR;
+    new_nd->offset = (current_token->str[0] - 'a' + 1) * 8;
+    current_token = current_token->next;
+    return new_nd;
 }

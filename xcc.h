@@ -18,6 +18,14 @@ typedef enum {
 // Token構造体を単にTokenとして定義
 typedef struct Token Token;
 
+// 関数構造体
+typedef struct Func Func;
+
+struct Func {
+    int len;
+    char *name;
+};
+
 // Token構造体
 // これを複数繋げていくことでトークナイズする
 struct Token {
@@ -46,7 +54,8 @@ typedef enum {
     ND_IF,     // if
     ND_WHILE,  // while
     ND_FOR,    // for
-    ND_BLOCK   // block
+    ND_BLOCK,   // block
+    ND_FUNC,
 } NodeKind;
 
 typedef struct Node Node;
@@ -60,6 +69,7 @@ struct Node {
     Node *block[100]; // ブロック内のstatementの配列
     int val;
     int offset; // ローカル変数のスタック上での位置(rbp - x)
+    Func *func; // 関数ノードの名前
 };
 
 typedef struct LVar LVar;

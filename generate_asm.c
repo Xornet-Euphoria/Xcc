@@ -19,9 +19,22 @@ static void gen(Node *node) {
     current_label = label_index;
     label_index++;
 
+    int f_length;
+    char f_name[100];
+
+    if (node->kind == ND_FUNC) {
+        f_length = node->func->len;
+        strncpy(f_name, node->func->name, f_length);
+        f_name[f_length] = '\0';
+    }
+
     switch (node->kind) {
         case ND_NUM:
             printf("    push %d\n", node->val);
+            return;
+        case ND_FUNC:
+            printf("    call %s\n", f_name);
+            printf("    push rax\n");
             return;
         // 代入左辺以外で変数が示された場合
         case ND_LVAR:
@@ -32,6 +45,7 @@ static void gen(Node *node) {
             return;
         case ND_ASSIGN:
             gen_lvar(node->lhs); // スタックトップから2番目に変数のアドレス
+            
             gen(node->rhs); // スタックトップに右辺計算結果
 
             printf("    pop rdi\n"); // 右辺計算結果

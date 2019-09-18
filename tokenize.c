@@ -167,6 +167,7 @@ Token *tokenize(char *p) {
             int length = 1;
             while (isalnum(*p)) {
                 p++;
+                length++;
             }
             cur = new_token(TK_IDENT, cur, q);
             cur->len = length;

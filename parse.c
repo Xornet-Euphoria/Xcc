@@ -238,9 +238,23 @@ static Node *new_primary() {
 
     // todo: new_node_identとか作った方が楽かもしれない
     Node *new_nd = calloc(1, sizeof(Node));
-    new_nd->kind = ND_LVAR;
 
     Token *tk = consume_ident();
+    
+    // 関数呼び出し
+    if (consume("(")) {
+        // todo: 引数
+        new_nd->kind = ND_FUNC;
+        Func *new_func = calloc(1, sizeof(Func));
+        new_nd->func = new_func;
+        new_func->name = tk->str;
+        new_func->len = tk->len;
+        expect(")");
+        return new_nd;
+    }
+
+    // 変数
+    new_nd->kind = ND_LVAR;
     LVar *lvar = find_lvar(tk);
     
     if (lvar == NULL) {

@@ -87,6 +87,22 @@ static Node *new_stmt() {
         return node;
     }
 
+    // for, まずは必ず初期化や条件が存在している場合
+    if (consume("for")) {
+        expect("(");
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_FOR;
+        node->init = new_expr();
+        expect(";");
+        node->cond = new_expr();
+        expect(";");
+        node->lhs = new_expr();
+        expect(")");
+        node->rhs = new_stmt();
+
+        return node;
+    }
+
     if (consume("return")) {
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;

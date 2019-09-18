@@ -55,6 +55,7 @@ struct Node {
     NodeKind kind;
     Node *lhs;
     Node *rhs;
+    Node *cond; // ループやジャンプの条件節
     int val;
     int offset; // ローカル変数のスタック上での位置(rbp - x)
 };

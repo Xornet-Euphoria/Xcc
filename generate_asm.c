@@ -40,18 +40,19 @@ static void gen(Node *node) {
             printf("    push rdi\n"); // 二重代入(a=b=2)を許すためにrdiを再利用する
             return;
         case ND_IF:
-            gen(node->lhs);
+            gen(node->cond);
             printf("    pop rax\n");
             printf("    cmp rax, 0\n");
-            if (node->rhs->kind == ND_ELSE) {
+            if (node->rhs != NULL) {
+                // else節が存在する場合
                 printf("    je .Lelse%d\n", current_label);
-                gen(node->rhs->lhs);
+                gen(node->lhs);
                 printf("    jmp .Lend%d\n", current_label);
                 printf(".Lelse%d:\n", current_label);
-                gen(node->rhs->rhs);
+                gen(node->rhs);
             } else {
                 printf("    je .Lend%d\n", current_label);
-                gen(node->rhs);
+                gen(node->lhs);
             }
             printf(".Lend%d:\n", current_label);
             return;

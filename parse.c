@@ -60,18 +60,17 @@ static Node *new_stmt() {
         expect("(");
         node = calloc(1, sizeof(Node));
         node->kind = ND_IF;
-        node->lhs = new_expr();
+        node->cond = new_expr();
         expect(")");
         
-        Node *true_stmt = new_stmt();
+        node->lhs = new_stmt();
 
         if (consume("else")) {
-            Node *else_node = new_node(ND_ELSE, true_stmt, new_stmt());
-            node->rhs = else_node;
+            node->rhs = new_stmt();
         } else {
-            node->rhs = true_stmt;
+            node->rhs = NULL;
         }
-        
+
         return node;
     }
 

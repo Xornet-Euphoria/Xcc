@@ -62,8 +62,16 @@ static Node *new_stmt() {
         node->kind = ND_IF;
         node->lhs = new_expr();
         expect(")");
-        node->rhs = new_stmt();
+        
+        Node *true_stmt = new_stmt();
 
+        if (consume("else")) {
+            Node *else_node = new_node(ND_ELSE, true_stmt, new_stmt());
+            node->rhs = else_node;
+        } else {
+            node->rhs = true_stmt;
+        }
+        
         return node;
     }
 

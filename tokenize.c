@@ -39,6 +39,18 @@ bool consume(char *op) {
     return true;
 }
 
+// 次のトークンが何かの確認(if (expr) statement else といった場合のelse検知に必要)
+bool next_check(char *op) {
+    Token *next_token = current_token->next;
+    if (next_token->kind != TK_RESERVED || 
+        next_token->len != strlen(op)   || 
+        strncmp(next_token->str, op, next_token->len) != 0) {
+        return false;
+    }
+
+    return true;
+}
+
 // 期待文字列でなければエラー
 void expect(char *op) {
     if (current_token->kind != TK_RESERVED || 
@@ -102,6 +114,13 @@ Token *tokenize(char *p) {
             cur = new_token(TK_RESERVED, cur, p);
             cur->len = 6;
             p += 6;
+            continue;
+        }
+
+        if (strncmp(p, "else", 4) == 0 && !isalnum(p[4])) {
+            cur = new_token(TK_RESERVED, cur, p);
+            cur->len = 4;
+            p += 4;
             continue;
         }
 

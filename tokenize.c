@@ -39,18 +39,6 @@ bool consume(char *op) {
     return true;
 }
 
-// 次のトークンが何かの確認(if (expr) statement else といった場合のelse検知に必要)
-bool next_check(char *op) {
-    Token *next_token = current_token->next;
-    if (next_token->kind != TK_RESERVED || 
-        next_token->len != strlen(op)   || 
-        strncmp(next_token->str, op, next_token->len) != 0) {
-        return false;
-    }
-
-    return true;
-}
-
 // 期待文字列でなければエラー
 void expect(char *op) {
     if (current_token->kind != TK_RESERVED || 
@@ -88,6 +76,11 @@ bool at_eof() {
     return current_token->kind == TK_EOF;
 }
 
+static bool strictstrcmp(char *haystack, char *needle) {
+    int length = strlen(needle);
+    return (strncmp(haystack, needle, length) == 0 && !isalnum(haystack[length]));
+}
+
 static Token *new_token(TokenKind kind, Token *cur, char *str) {
     // Tokenと同じサイズのメモリを確保
     Token *new_tk = calloc(1, sizeof(Token));
@@ -110,21 +103,21 @@ Token *tokenize(char *p) {
             continue;
         }
 
-        if (strncmp(p, "return", 6) == 0 && !isalnum(p[6])) {
+        if (strictstrcmp(p, "return")) {
             cur = new_token(TK_RESERVED, cur, p);
             cur->len = 6;
             p += 6;
             continue;
         }
 
-        if (strncmp(p, "else", 4) == 0 && !isalnum(p[4])) {
+        if (strictstrcmp(p, "else")) {
             cur = new_token(TK_RESERVED, cur, p);
             cur->len = 4;
             p += 4;
             continue;
         }
 
-        if (strncmp(p, "if", 2) == 0 && !isalnum(p[2])) {
+        if (strictstrcmp(p, "if")) {
             cur = new_token(TK_RESERVED, cur, p);
             cur->len = 2;
             p += 2;

@@ -46,6 +46,7 @@ typedef enum {
     ND_IF,     // if
     ND_WHILE,  // while
     ND_FOR,    // for
+    ND_BLOCK   // block
 } NodeKind;
 
 typedef struct Node Node;
@@ -56,6 +57,7 @@ struct Node {
     Node *rhs;
     Node *cond; // ループやジャンプの条件節
     Node *init; // forの初期化文
+    Node *block[100]; // ブロック内のstatementの配列
     int val;
     int offset; // ローカル変数のスタック上での位置(rbp - x)
 };

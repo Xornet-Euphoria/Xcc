@@ -103,6 +103,21 @@ static Node *new_stmt() {
         return node;
     }
 
+    if (consume("{")) {
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_BLOCK;
+        int index = 0;
+        while(!consume("}")) {
+            node->block[index] = new_stmt();
+            index++;
+        }
+
+        // 終端
+        node->block[index] = NULL;
+
+        return node;
+    }
+
     if (consume("return")) {
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;

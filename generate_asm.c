@@ -85,6 +85,15 @@ static void gen(Node *node) {
             printf("    pop rbp\n");
             printf("    ret\n");
             return;
+        case ND_BLOCK:
+            for (int i = 0; node->block[i] != NULL; i++) {
+                gen(node->block[i]);
+                if (node->block[i + 1] == NULL) {
+                    break;
+                }
+                printf("    pop rax\n");
+            }
+            return;
     }
 
     gen(node->lhs);

@@ -74,6 +74,19 @@ static Node *new_stmt() {
         return node;
     }
 
+    // while
+    if (consume("while")) {
+        expect("(");
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_WHILE;
+        node->cond = new_expr();
+        expect(")");
+
+        node->lhs = new_stmt();
+
+        return node;
+    }
+
     if (consume("return")) {
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;

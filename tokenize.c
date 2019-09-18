@@ -110,10 +110,24 @@ Token *tokenize(char *p) {
             continue;
         }
 
+        if (strictstrcmp(p, "while")) {
+            cur = new_token(TK_RESERVED, cur, p);
+            cur->len = 5;
+            p += 5;
+            continue;
+        }
+
         if (strictstrcmp(p, "else")) {
             cur = new_token(TK_RESERVED, cur, p);
             cur->len = 4;
             p += 4;
+            continue;
+        }
+
+        if (strictstrcmp(p, "for")) {
+            cur = new_token(TK_RESERVED, cur, p);
+            cur->len = 3;
+            p += 3;
             continue;
         }
 

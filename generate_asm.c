@@ -26,15 +26,51 @@ static void gen(Node *node) {
         f_length = node->func->len;
         strncpy(f_name, node->func->name, f_length);
         f_name[f_length] = '\0';
+
+        // 引数を用意
+        if (node->func->start != NULL) {
+            Arg *current_arg = node->func->start;
+
+            while (true) {
+                gen(current_arg->value);
+                printf("    pop rax\n");
+                switch (current_arg->arg_num){
+                    case 1:
+                        printf("    mov rdi, rax\n");
+                        break;
+                    case 2:
+                        printf("    mov rsi, rax\n");
+                        break;
+                    case 3:
+                        printf("    mov rdx, rax\n");
+                        break;
+                    case 4:
+                        printf("    mov rcx, rax\n");
+                        break;
+                    case 5:
+                        printf("    mov r8, rax\n");
+                        break;
+                    case 6:
+                        printf("    mov r9, rax\n");
+                        break;
+                }
+
+                if (current_arg->next == NULL) {
+                    break;
+                }
+
+                current_arg = current_arg->next;
+            }
+        }
+
+        printf("    call %s\n", f_name);
+        printf("    push rax\n");
+        return;
     }
 
     switch (node->kind) {
         case ND_NUM:
             printf("    push %d\n", node->val);
-            return;
-        case ND_FUNC:
-            printf("    call %s\n", f_name);
-            printf("    push rax\n");
             return;
         // 代入左辺以外で変数が示された場合
         case ND_LVAR:

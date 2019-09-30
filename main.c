@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
     user_input = argv[1];
     // tokenize
     current_token = tokenize(argv[1]);
+
     // 抽象木の作成
     new_program();
 

@@ -249,7 +249,35 @@ static Node *new_primary() {
         new_nd->func = new_func;
         new_func->name = tk->str;
         new_func->len = tk->len;
-        expect(")");
+        new_func->start = NULL;
+        int arg_num = 0;
+
+        Arg *previous_arg;
+
+        while (!consume(")")) {
+            arg_num++;
+            
+            Node *arg_node = new_primary();
+            Arg *new_arg = calloc(1, sizeof(Arg));
+            new_arg->value = arg_node;
+
+            new_arg->arg_num = arg_num;
+
+            if (new_func->start == NULL) {
+                new_func->start = new_arg;
+            } else {
+                previous_arg->next = new_arg;
+            }
+
+            previous_arg = new_arg;
+
+            if (!consume(",")) {
+                new_arg->next = NULL;
+                expect(")");
+                break;
+            }
+        }
+
         return new_nd;
     }
 

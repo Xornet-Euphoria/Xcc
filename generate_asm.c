@@ -22,7 +22,7 @@ static void gen(Node *node) {
     int f_length;
     char f_name[100];
 
-    if (node->kind == ND_FUNC) {
+    if (node->kind == ND_FUNC_CALL) {
         f_length = node->func->len;
         strncpy(f_name, node->func->name, f_length);
         f_name[f_length] = '\0';

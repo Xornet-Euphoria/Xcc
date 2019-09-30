@@ -28,7 +28,6 @@ struct Arg {
     Arg *next;
 };
 
-
 struct Func {
     int len;
     char *name;
@@ -64,7 +63,8 @@ typedef enum {
     ND_WHILE,  // while
     ND_FOR,    // for
     ND_BLOCK,   // block
-    ND_FUNC,
+    ND_FUNC_DEF, // call function
+    ND_FUNC_CALL // define funciton
 } NodeKind;
 
 struct Node {

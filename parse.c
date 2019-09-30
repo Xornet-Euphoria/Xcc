@@ -44,11 +44,29 @@ static LVar *find_lvar(Token *tok) {
 void new_program() {
     int i = 0;
     while (!at_eof()) {
-        code[i] = new_stmt();
+        code[i] = new_function();
         i++;
     }
     // 終端
     code[i] = NULL;
+}
+
+// function
+static Node *new_function() {
+    Node *node;
+    
+    consume_ident();
+    expect("(");
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_FUNC_DEF;
+    // todo: 引数
+    expect(")");
+
+    expect("{");
+    node->lhs = new_stmt();
+    expect("}");
+
+    return node;
 }
 
 // statement
@@ -243,8 +261,7 @@ static Node *new_primary() {
     
     // 関数呼び出し
     if (consume("(")) {
-        // todo: 引数
-        new_nd->kind = ND_FUNC;
+        new_nd->kind = ND_FUNC_CALL;
         Func *new_func = calloc(1, sizeof(Func));
         new_nd->func = new_func;
         new_func->name = tk->str;

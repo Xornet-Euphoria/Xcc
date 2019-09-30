@@ -20,7 +20,15 @@ typedef struct Token Token;
 typedef struct Node Node;
 typedef struct Arg Arg;
 typedef struct Func Func;
+typedef struct DefFunc DefFunc;
 typedef struct LVar LVar;
+
+struct LVar {
+    LVar *next;
+    char *name;
+    int len;
+    int offset;
+};
 
 struct Arg {
     Node *value;
@@ -32,6 +40,12 @@ struct Func {
     int len;
     char *name;
     Arg *start;
+};
+
+struct DefFunc {
+    int len;
+    char *name;
+    LVar *start;
 };
 
 // Token構造体
@@ -76,17 +90,10 @@ struct Node {
     Node *block[100]; // ブロック内のstatementの配列
     int val;
     int offset; // ローカル変数のスタック上での位置(rbp - x)
-    Func *func; // 関数ノードの名前
+    Func *func; // 関数呼び出しに関するデータ
+    DefFunc *def_func; // 関数定義に関するデータ
 };
 
-struct LVar {
-    LVar *next;
-    char *name;
-    int len;
-    int offset;
-};
-
-// variables
 // 現時点で注目しているトークン、これを進めていくことで順にトークンを処理していく
 extern Token *current_token;
 

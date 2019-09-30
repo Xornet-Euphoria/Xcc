@@ -22,6 +22,27 @@ static void gen(Node *node) {
     int f_length;
     char f_name[100];
 
+    if (node->kind == ND_FUNC_DEF) {
+        f_length = node->def_func->len;
+        strncpy(f_name, node->def_func->name, f_length);
+        f_name[f_length] = '\0';
+
+        printf(".global %s\n", f_name);
+        printf("%s:\n", f_name);
+
+        // ローカル変数確保
+        int var_count = 0;
+        for (LVar *lvar = node->def_func->start; lvar; lvar = lvar->next) {
+            var_count++;
+        }
+        printf("    push rbp\n");
+        printf("    mov rbp, rsp\n");
+        printf("    sub rsp, %d\n", var_count * 8);
+
+        gen(node->lhs);
+        return;
+    }
+
     if (node->kind == ND_FUNC_CALL) {
         f_length = node->func->len;
         strncpy(f_name, node->func->name, f_length);
@@ -199,27 +220,8 @@ static void gen(Node *node) {
 
 void generate_asm() {
     printf(".intel_syntax noprefix\n");
-    printf(".global main\n");
-    printf("main:\n");
-
-    // ローカル変数確保
-    int var_count = 0;
-    for (LVar *lvar = local_var; lvar; lvar = lvar->next) {
-        var_count++;
-    }
-    printf("    push rbp\n");
-    printf("    mov rbp, rsp\n");
-    printf("    sub rsp, %d\n", var_count * 8);
 
     for (int i = 0; code[i] != NULL; i++) {
         gen(code[i]);
-
-        // 各処理において最後の計算結果がスタックトップにあるはずなのでそれをpopする
-        // したがって任意のcode処理の結果は必ずraxに格納される
-        printf("    pop rax\n");
     }
-
-    printf("    mov rsp, rbp\n"); // スタックを元に戻す
-    printf("    pop rbp\n");
-    printf("    ret\n");
 }

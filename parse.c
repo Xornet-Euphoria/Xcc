@@ -2,8 +2,9 @@
 
 Node *code[100];
 LVar *local_var;
-static int current_offset = 0;
+static int current_offset;
 
+static Node *new_function();
 static Node *new_stmt();
 static Node *new_expr();
 static Node *new_assign();
@@ -44,6 +45,8 @@ static LVar *find_lvar(Token *tok) {
 void new_program() {
     int i = 0;
     while (!at_eof()) {
+        current_offset = 0;
+        local_var = NULL;
         code[i] = new_function();
         i++;
     }
@@ -55,16 +58,19 @@ void new_program() {
 static Node *new_function() {
     Node *node;
     
-    consume_ident();
+    Token *tk = consume_ident();
     expect("(");
     node = calloc(1, sizeof(Node));
     node->kind = ND_FUNC_DEF;
+    DefFunc *def_func = calloc(1, sizeof(DefFunc));
+    def_func->name = tk->str;
+    def_func->len = tk->len;
+    node->def_func = def_func;
     // todo: 引数
     expect(")");
 
-    expect("{");
     node->lhs = new_stmt();
-    expect("}");
+    def_func->start = local_var;
 
     return node;
 }

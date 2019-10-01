@@ -5,3 +5,5 @@ tmp*
 a.out
 xcc
 test
+.gdb_history
+peda-session-tmp.txt

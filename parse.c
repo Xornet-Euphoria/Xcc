@@ -305,7 +305,7 @@ static Node *new_primary() {
         while (!consume(")")) {
             arg_num++;
             
-            Node *arg_node = new_primary();
+            Node *arg_node = new_equality();
             Arg *new_arg = calloc(1, sizeof(Arg));
             new_arg->value = arg_node;
 

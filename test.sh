@@ -47,16 +47,29 @@ main() {
   return fn(a, b);
 }"
 
-try 4 "fn(n) {
-  return n;
-}
-
-f(n) {
-  return fn(n) + 1;
+try 6 "f(n) {
+  if (n == 1) {
+    return 1;
+  }
+  return f(n - 1) * n;
 }
 
 main() {
   return f(3);
+}"
+
+try 5 "fb(n) {
+  if (n == 1) {
+    return 1;
+  }
+  if (n == 2) {
+    return 1;
+  }
+  return fb(n - 2) + fb(n - 1);
+}
+
+main(){
+  return fb(5);
 }"
 
 echo OK

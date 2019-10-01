@@ -192,7 +192,6 @@ static void gen(Node *node) {
                 if (node->block[i + 1] == NULL) {
                     break;
                 }
-                printf("    pop rax\n");
             }
             return;
     }

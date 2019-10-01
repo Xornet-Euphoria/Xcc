@@ -66,11 +66,36 @@ static Node *new_function() {
     def_func->name = tk->str;
     def_func->len = tk->len;
     node->def_func = def_func;
-    // todo: 引数
-    expect(")");
+
+    int arg_num = 0;
+
+    while (!consume(")")) {
+        Token *tk = consume_ident();
+
+        // 引数の数
+        LVar *lvar = find_lvar(tk);
+    
+        // todo: 関数定義で同じ名前の引数が出たときの対処
+        if (lvar == NULL) {
+            arg_num++;
+            lvar = calloc(1, sizeof(LVar));
+            lvar->next = local_var;
+            lvar->name = tk->str;
+            lvar->len = tk->len;
+            lvar->offset = current_offset + 8;
+            current_offset = lvar->offset;
+            local_var = lvar;
+        }
+
+        if (!consume(",")) {
+            expect(")");
+            break;
+        }
+    }
 
     node->lhs = new_stmt();
     def_func->start = local_var;
+    def_func->arg_num = arg_num;
 
     return node;
 }

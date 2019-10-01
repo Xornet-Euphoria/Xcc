@@ -35,4 +35,28 @@ try 3 "main() {
   return a;
 }"
 
+try 30 "fn(a,b) {
+  a = a + 1;
+  b = b + 1;
+  return a * b;
+}
+
+main() {
+  a = 4;
+  b = 5;
+  return fn(a, b);
+}"
+
+try 4 "fn(n) {
+  return n;
+}
+
+f(n) {
+  return fn(n) + 1;
+}
+
+main() {
+  return f(3);
+}"
+
 echo OK

@@ -35,9 +35,39 @@ static void gen(Node *node) {
         for (LVar *lvar = node->def_func->start; lvar; lvar = lvar->next) {
             var_count++;
         }
+
         printf("    push rbp\n");
         printf("    mov rbp, rsp\n");
         printf("    sub rsp, %d\n", var_count * 8);
+
+        // 渡された引数の処理
+        int arg_num = node->def_func->arg_num;
+
+        for (int i = 1; i <= arg_num; i++) {
+            printf("    mov rax, rbp\n");
+            printf("    sub rax, %d\n", i * 8);
+
+            switch (i) {
+                case 1:
+                    printf("    mov [rax], rdi\n");
+                    break;
+                case 2:
+                    printf("    mov [rax], rsi\n");
+                    break;
+                case 3:
+                    printf("    mov [rax], rdx\n");
+                    break;
+                case 4:
+                    printf("    mov [rax], rcx\n");
+                    break;
+                case 5:
+                    printf("    mov [rax], r8\n");
+                    break;
+                case 6:
+                    printf("    mov [rax], r9\n");
+                    break;
+            }
+        }
 
         gen(node->lhs);
         return;
@@ -55,7 +85,7 @@ static void gen(Node *node) {
             while (true) {
                 gen(current_arg->value);
                 printf("    pop rax\n");
-                switch (current_arg->arg_num){
+                switch (current_arg->arg_num) {
                     case 1:
                         printf("    mov rdi, rax\n");
                         break;

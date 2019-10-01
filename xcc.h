@@ -46,6 +46,7 @@ struct DefFunc {
     int len;
     char *name;
     LVar *start;
+    int arg_num;
 };
 
 // Token構造体

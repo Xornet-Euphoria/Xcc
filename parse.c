@@ -2,7 +2,6 @@
 
 Node *code[100];
 LVar *local_var;
-static int current_offset;
 
 static Node *new_function();
 static Node *new_stmt();
@@ -45,7 +44,6 @@ static LVar *find_lvar(Token *tok) {
 void new_program() {
     int i = 0;
     while (!at_eof()) {
-        current_offset = 0;
         local_var = NULL;
         code[i] = new_function();
         i++;

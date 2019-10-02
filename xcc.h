@@ -93,7 +93,6 @@ struct Node {
     Node *init; // forの初期化文
     Node *block[100]; // ブロック内のstatementの配列
     int val;
-    int offset; // ローカル変数のスタック上での位置(rbp - x)
     LVar *lvar; // 変数ノードの場合、どの変数か
     Func *func; // 関数呼び出しに関するデータ
     DefFunc *def_func; // 関数定義に関するデータ

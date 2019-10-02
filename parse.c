@@ -65,27 +65,25 @@ static Node *new_function() {
     DefFunc *def_func = calloc(1, sizeof(DefFunc));
     def_func->name = tk->str;
     def_func->len = tk->len;
+    def_func->start = NULL;
     node->def_func = def_func;
 
+    // 引数の数
     int arg_num = 0;
 
     while (!consume(")")) {
+        expect("int");
         Token *tk = consume_ident();
+        arg_num++;
+        LVar *lvar = calloc(1, sizeof(LVar));
 
-        // 引数の数
-        LVar *lvar = find_lvar(tk);
-    
-        // todo: 関数定義で同じ名前の引数が出たときの対処
-        if (lvar == NULL) {
-            arg_num++;
-            lvar = calloc(1, sizeof(LVar));
-            lvar->next = local_var;
-            lvar->name = tk->str;
-            lvar->len = tk->len;
-            lvar->offset = current_offset + 8;
-            current_offset = lvar->offset;
-            local_var = lvar;
-        }
+        lvar->next = local_var;
+
+        // todo: オフセットの設定(アセンブリを吐く時に引数チェーンを辿る方針へ)
+        lvar->name = tk->str;
+        lvar->len = tk->len;
+
+        local_var = lvar;
 
         if (!consume(",")) {
             expect(")");
@@ -93,9 +91,10 @@ static Node *new_function() {
         }
     }
 
+    def_func->arg_num = arg_num;
+
     node->lhs = new_stmt();
     def_func->start = local_var;
-    def_func->arg_num = arg_num;
 
     return node;
 }
@@ -181,6 +180,23 @@ static Node *new_stmt() {
 }
 
 static Node *new_expr() {
+    if (consume("int")) {
+        Token *tk = consume_ident();
+
+        Node *node = calloc(1, sizeof(Node));
+        node->kind = ND_LVAR_DEF;
+
+        LVar *lvar = calloc(1, sizeof(LVar));
+
+        lvar->next = local_var;
+        lvar->name = tk->str;
+        lvar->len = tk->len;
+
+        local_var = lvar;
+
+        return node;
+    }
+
     return new_assign();
 }
 
@@ -349,17 +365,12 @@ static Node *new_primary() {
     // 変数
     new_nd->kind = ND_LVAR;
     LVar *lvar = find_lvar(tk);
+
+    new_nd->lvar = lvar;
     
     if (lvar == NULL) {
-        lvar = calloc(1, sizeof(LVar));
-        lvar->next = local_var;
-        lvar->name = tk->str;
-        lvar->len = tk->len;
-        lvar->offset = current_offset + 8;
-        current_offset = lvar->offset;
-        local_var = lvar;
+        simple_error("undefined variable");
     }
 
-    new_nd->offset = lvar->offset;
     return new_nd;
 }

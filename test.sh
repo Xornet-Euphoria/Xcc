@@ -21,13 +21,18 @@ try 4 "fn() {
 }
 
 main(){
+  int foo;
   foo = fn();
   return foo + 1;
 }"
+
 try 3 "main() {
+  int a;
   a = 51;
+  int b;
   b = 12;
   while (b != 0) {
+    int tmp;
     tmp = b;
     b = a % b;
     a = tmp;
@@ -35,19 +40,21 @@ try 3 "main() {
   return a;
 }"
 
-try 30 "fn(a,b) {
+try 30 "fn(int a, int b) {
   a = a + 1;
   b = b + 1;
   return a * b;
 }
 
 main() {
+  int a;
+  int b;
   a = 4;
   b = 5;
   return fn(a, b);
 }"
 
-try 6 "f(n) {
+try 6 "f(int n) {
   if (n == 1) {
     return 1;
   }
@@ -58,7 +65,7 @@ main() {
   return f(3);
 }"
 
-try 5 "fb(n) {
+try 5 "fb(int n) {
   if (n == 1) {
     return 1;
   }
@@ -73,12 +80,17 @@ main(){
 }"
 
 try 3 "main(){
+  int x;
+  int y;
   x = 3;
   y = &x;
   return *y;
 }"
 
 try 3 "main() {
+  int x;
+  int y;
+  int z;
   x = 3;
   y = 4;
   z = &y + 8;

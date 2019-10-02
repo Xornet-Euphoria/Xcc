@@ -10,7 +10,7 @@ void gen_lvar(Node *node) {
     }
 
     printf("    mov rax, rbp\n");
-    printf("    sub rax, %d\n", node->offset);
+    printf("    sub rax, %d\n", node->lvar->offset);
     printf("    push rax\n"); // スタックトップに指定変数のアドレスが来る
 }
 
@@ -34,6 +34,13 @@ static void gen(Node *node) {
         int var_count = 0;
         for (LVar *lvar = node->def_func->start; lvar; lvar = lvar->next) {
             var_count++;
+        }
+
+        int offset = 0;
+
+        for (LVar *lvar = node->def_func->start; lvar; lvar = lvar->next) {
+            lvar->offset = (var_count - offset) * 8;
+            offset++;
         }
 
         printf("    push rbp\n");
@@ -120,14 +127,17 @@ static void gen(Node *node) {
     }
 
     switch (node->kind) {
+        case ND_LVAR_DEF:
+            // 特に吐き出すアセンブリは今の所なし
+            return;
         case ND_NUM:
             printf("    push %d\n", node->val);
             return;
         // 代入左辺以外で変数が示された場合
         case ND_LVAR:
-            gen_lvar(node);
+            gen_lvar(node); // node->lvarに対応したアドレスが降ってくる
             printf("    pop rax\n");
-            printf("    mov rax, [rax]\n"); // raxで指定したアドレスの値をraxに再代入する
+            printf("    mov rax, [rax]\n"); // raxで指定したアドレスの値をraxに代入する
             printf("    push rax\n");
             return;
         case ND_ASSIGN:

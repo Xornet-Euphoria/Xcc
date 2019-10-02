@@ -27,7 +27,7 @@ void error(char *loc, char *fmt, ...) {
 
 // トークン種が期待通りだったときに次のトークンへ進める処理群
 
-// 単なる文字判定
+// 単なる予約語の文字判定
 bool consume(char *op) {
     if (current_token->kind != TK_RESERVED || 
         current_token->len != strlen(op)   || 
@@ -121,6 +121,13 @@ Token *tokenize(char *p) {
             cur = new_token(TK_RESERVED, cur, p);
             cur->len = 4;
             p += 4;
+            continue;
+        }
+
+        if (strictstrcmp(p, "int")) {
+            cur = new_token(TK_RESERVED, cur, p);
+            cur->len = 3;
+            p += 3;
             continue;
         }
 

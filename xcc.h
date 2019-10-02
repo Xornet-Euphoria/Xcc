@@ -81,7 +81,8 @@ typedef enum {
     ND_FOR,    // for
     ND_BLOCK,   // block
     ND_FUNC_DEF, // call function
-    ND_FUNC_CALL // define funciton
+    ND_FUNC_CALL, // define funciton
+    ND_LVAR_DEF
 } NodeKind;
 
 struct Node {
@@ -93,6 +94,7 @@ struct Node {
     Node *block[100]; // ブロック内のstatementの配列
     int val;
     int offset; // ローカル変数のスタック上での位置(rbp - x)
+    LVar *lvar; // 変数ノードの場合、どの変数か
     Func *func; // 関数呼び出しに関するデータ
     DefFunc *def_func; // 関数定義に関するデータ
 };

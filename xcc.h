@@ -66,6 +66,8 @@ typedef enum {
     ND_MUL,
     ND_DIV,
     ND_MOD,    // modulo (%)
+    ND_DEREF,  // 値参照 (*ptr)
+    ND_ADDR,   // アドレス参照 (&ptr)
     ND_NUM,
     ND_EQ,     // equal(==)
     ND_NEQ,    // not equal(!=)

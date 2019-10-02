@@ -270,6 +270,23 @@ static Node *new_unary() {
         return new_node(ND_SUB, new_node_num(0), new_primary());
     }
 
+    // *p: dereference
+    if (consume("*")) {
+        Node* new_deref = calloc(1, sizeof(Node));
+        new_deref->kind = ND_DEREF;
+        new_deref->lhs = new_unary(); // ポインタのポインタ(**p)のようなものに対応するため
+        
+        return new_deref;
+    }
+
+    if (consume("&")) {
+        Node* new_deref = calloc(1, sizeof(Node));
+        new_deref->kind = ND_ADDR;
+        new_deref->lhs = new_unary(); // ポインタのポインタ(**p)のようなものに対応するため
+        
+        return new_deref;
+    }
+
     return new_primary();
 }
 

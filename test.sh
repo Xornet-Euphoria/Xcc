@@ -72,4 +72,17 @@ main(){
   return fb(5);
 }"
 
+try 3 "main(){
+  x = 3;
+  y = &x;
+  return *y;
+}"
+
+try 3 "main() {
+  x = 3;
+  y = 4;
+  z = &y + 8;
+  return *z;
+}"
+
 echo OK

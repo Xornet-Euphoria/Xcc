@@ -3,7 +3,7 @@
 Node *code[100];
 static int label_index = 0;
 
-// 代入式で次に操作するアドレスを用意
+// ローカル変数のアドレスを用意
 void gen_lvar(Node *node) {
     if (node->kind != ND_LVAR) {
         simple_error("left hand side must be variable identifer");
@@ -11,7 +11,7 @@ void gen_lvar(Node *node) {
 
     printf("    mov rax, rbp\n");
     printf("    sub rax, %d\n", node->offset);
-    printf("    push rax\n"); // スタックトップに指定変数の値を格納するアドレスが来る
+    printf("    push rax\n"); // スタックトップに指定変数のアドレスが来る
 }
 
 static void gen(Node *node) {
@@ -193,6 +193,17 @@ static void gen(Node *node) {
                     break;
                 }
             }
+            return;
+        case ND_DEREF:
+            // 引数はポインタ
+            gen(node->lhs); // ここでスタックトップにあるのはポインタ
+            printf("    pop rax\n");
+            printf("    mov rax, [rax]\n");
+            printf("    push rax\n");
+            return;
+        case ND_ADDR:
+            // 引数は任意の変数(ポインタ型かもしれないし数値型かもしれない)
+            gen_lvar(node->lhs); // スタックトップには変数の値が来る
             return;
     }
 

@@ -16,17 +16,17 @@ try() {
   fi
 }
 
-try 4 "fn() {
+try 4 "int fn() {
   return 3;
 }
 
-main(){
+int main(){
   int foo;
   foo = fn();
   return foo + 1;
 }"
 
-try 3 "main() {
+try 3 "int main() {
   int a;
   a = 51;
   int b;
@@ -40,13 +40,13 @@ try 3 "main() {
   return a;
 }"
 
-try 30 "fn(int a, int b) {
+try 30 "int fn(int a, int b) {
   a = a + 1;
   b = b + 1;
   return a * b;
 }
 
-main() {
+int main() {
   int a;
   int b;
   a = 4;
@@ -54,18 +54,18 @@ main() {
   return fn(a, b);
 }"
 
-try 6 "f(int n) {
+try 6 "int f(int n) {
   if (n == 1) {
     return 1;
   }
   return f(n - 1) * n;
 }
 
-main() {
+int main() {
   return f(3);
 }"
 
-try 5 "fb(int n) {
+try 5 "int fb(int n) {
   if (n == 1) {
     return 1;
   }
@@ -75,11 +75,11 @@ try 5 "fb(int n) {
   return fb(n - 2) + fb(n - 1);
 }
 
-main(){
+int main(){
   return fb(5);
 }"
 
-try 3 "main(){
+try 3 "int main(){
   int x;
   int y;
   x = 3;
@@ -87,7 +87,7 @@ try 3 "main(){
   return *y;
 }"
 
-try 3 "main() {
+try 3 "int main() {
   int x;
   int y;
   int z;

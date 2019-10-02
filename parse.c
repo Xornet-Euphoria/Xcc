@@ -57,6 +57,8 @@ void new_program() {
 // function
 static Node *new_function() {
     Node *node;
+
+    expect("int");
     
     Token *tk = consume_ident();
     expect("(");
